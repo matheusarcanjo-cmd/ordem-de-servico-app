@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-zinc-100 text-zinc-900 antialiased;
+}
+
+/* Filete de faixa de pista sob a barra superior */
+.lane-stripe {
+  background: repeating-linear-gradient(90deg, #f5c518 0 48px, transparent 48px 76px);
+  height: 4px;
+}
+
+.input {
+  @apply w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm
+    focus:border-asfalto focus:outline-none focus:ring-2 focus:ring-faixa/60;
+}
+.label { @apply mb-1 block text-xs font-semibold uppercase tracking-wide text-zinc-600; }
+.btn { @apply inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition disabled:opacity-50; }
+.btn-primary { @apply btn bg-asfalto text-white hover:bg-asfalto-claro; }
+.btn-ghost { @apply btn border border-zinc-300 bg-white hover:bg-zinc-50; }
