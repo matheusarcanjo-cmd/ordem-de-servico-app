@@ -12,6 +12,23 @@ export const PODE_OPERAR: Papel[] = ['editor', 'admin'];
 /** Quem enxerga todas as OS (os demais veem só as próprias, via RLS). */
 export const VE_TODAS: Papel[] = ['aprovador', 'editor', 'admin'];
 
+/** Quem pode APAGAR uma OS definitivamente (com anexos e histórico). */
+export const PODE_APAGAR_OS: Papel[] = ['editor', 'admin'];
+
+/** Quem acessa a gestão de usuários (desativar/apagar). Criar e mudar papel: só Admin. */
+export const GERENCIA_USUARIOS: Papel[] = ['editor', 'admin'];
+
+/** O criador pode editar a própria OS enquanto Pendente; Admin edita sempre. */
+export function podeEditarOS(
+  papel: Papel,
+  status: Status,
+  solicitanteId: string,
+  userId: string
+): boolean {
+  if (papel === 'admin') return true;
+  return solicitanteId === userId && status === 'pendente';
+}
+
 /** Transições válidas. Estados finais não saem daqui (Admin pode sobrescrever). */
 export const TRANSICOES: Record<Status, Status[]> = {
   pendente: ['aprovada', 'rejeitada', 'cancelada'],

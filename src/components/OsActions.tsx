@@ -2,25 +2,31 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { alterarStatus } from '@/actions/os';
+import Link from 'next/link';
+import { alterarStatus, apagarOS } from '@/actions/os';
 import { STATUS_LABEL, type Papel, type Status } from '@/lib/types';
-import { TRANSICOES, PAPEL_POR_TRANSICAO } from '@/lib/permissions';
+import { TRANSICOES, PAPEL_POR_TRANSICAO, PODE_APAGAR_OS, podeEditarOS } from '@/lib/permissions';
 
 export function OsActions({
   osId,
   status,
   papel,
   souSolicitante,
+  solicitanteId,
+  userId,
 }: {
   osId: string;
   status: Status;
   papel: Papel;
   souSolicitante: boolean;
+  solicitanteId: string;
+  userId: string;
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [erro, setErro] = useState<string | null>(null);
   const [rejeitando, setRejeitando] = useState(false);
+  const [confirmaApagar, setConfirmaApagar] = useState(false);
   const [motivo, setMotivo] = useState('');
 
   const destinos = (papel === 'admin'
@@ -41,6 +47,18 @@ export function OsActions({
         setMotivo('');
         router.refresh();
       }
+    });
+  }
+
+  const podeEditar = podeEditarOS(papel, status, solicitanteId, userId);
+  const podeApagar = PODE_APAGAR_OS.includes(papel);
+
+  function apagar() {
+    setErro(null);
+    startTransition(async () => {
+      const res = await apagarOS(osId);
+      if (!res.ok) setErro(res.erro);
+      else router.push('/dashboard');
     });
   }
 
@@ -91,6 +109,44 @@ export function OsActions({
             disabled={pending || !motivo.trim()} onClick={() => mudar('rejeitada', motivo)}>
             Confirmar rejeição
           </button>
+        </div>
+      )}
+
+      {(podeEditar || podeApagar) && (
+        <div className="flex flex-wrap gap-2 border-t border-zinc-100 pt-3">
+          {podeEditar && (
+            <Link href={`/os/${osId}/editar`} className="btn-ghost">
+              Editar OS
+            </Link>
+          )}
+          {podeApagar && !confirmaApagar && (
+            <button className="btn-ghost text-red-700" disabled={pending}
+              onClick={() => setConfirmaApagar(true)}>
+              Apagar OS
+            </button>
+          )}
+        </div>
+      )}
+
+      {confirmaApagar && (
+        <div className="space-y-2 rounded-md border border-red-300 bg-red-50 p-3">
+          <p className="text-sm font-semibold text-red-800">
+            Apagar definitivamente esta OS?
+          </p>
+          <p className="text-xs text-red-700">
+            Diferente de Cancelar, esta ação remove a OS, os anexos e todo o histórico,
+            sem possibilidade de recuperação.
+          </p>
+          <div className="flex gap-2">
+            <button className="btn bg-red-600 text-white hover:bg-red-700"
+              disabled={pending} onClick={apagar}>
+              {pending ? 'Apagando…' : 'Sim, apagar definitivamente'}
+            </button>
+            <button className="btn-ghost" disabled={pending}
+              onClick={() => setConfirmaApagar(false)}>
+              Voltar
+            </button>
+          </div>
         </div>
       )}
 

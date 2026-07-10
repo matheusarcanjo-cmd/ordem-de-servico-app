@@ -2,7 +2,7 @@
 
 import { useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { anexarArquivo, criarOS } from '@/actions/os';
+import { anexarArquivo, criarOS, editarOS } from '@/actions/os';
 import {
   CAMERAS_LABEL,
   DATA_INICIAL_LABEL,
@@ -41,36 +41,51 @@ function SimNao({
   );
 }
 
+export interface OsInicial {
+  tipo: Tipo;
+  crs: string;
+  extensao_aprox: string;
+  data_inicial: string;
+  prazo_final: string;
+  detalhes: Record<string, unknown>;
+}
+
 export function OsForm({
   nomeSolicitante,
   autoAprova,
+  osId,
+  inicial,
 }: {
   nomeSolicitante: string;
   autoAprova: boolean;
+  osId?: string;
+  inicial?: OsInicial;
 }) {
+  const editando = Boolean(osId && inicial);
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [erro, setErro] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const [tipo, setTipo] = useState<Tipo | ''>('');
-  const [crs, setCrs] = useState('');
-  const [extensao, setExtensao] = useState('');
-  const [dataInicial, setDataInicial] = useState('imediatamente');
-  const [prazoFinal, setPrazoFinal] = useState('');
+  const det = (inicial?.detalhes ?? {}) as Record<string, unknown>;
+  const [tipo, setTipo] = useState<Tipo | ''>(inicial?.tipo ?? '');
+  const [crs, setCrs] = useState(inicial?.crs ?? '');
+  const [extensao, setExtensao] = useState(inicial?.extensao_aprox ?? '');
+  const [dataInicial, setDataInicial] = useState(inicial?.data_inicial ?? 'imediatamente');
+  const [prazoFinal, setPrazoFinal] = useState(inicial?.prazo_final ?? '');
   const [arquivos, setArquivos] = useState<File[]>([]);
 
   // Condicionais FWD
-  const [espacamento, setEspacamento] = useState('');
+  const [espacamento, setEspacamento] = useState(String(det.espacamento ?? ''));
   // Condicionais VDR
-  const [cameras, setCameras] = useState('todas');
-  const [gpsL1L2, setGpsL1L2] = useState(false);
+  const [cameras, setCameras] = useState(String(det.cameras ?? 'todas'));
+  const [gpsL1L2, setGpsL1L2] = useState(Boolean(det.gps_l1l2 ?? false));
   // Comuns a FWD e VDR
-  const [todasFaixas, setTodasFaixas] = useState(true);
-  const [faixasAdicionais, setFaixasAdicionais] = useState(false);
-  const [marginais, setMarginais] = useState(false);
+  const [todasFaixas, setTodasFaixas] = useState(Boolean(det.todas_faixas ?? true));
+  const [faixasAdicionais, setFaixasAdicionais] = useState(Boolean(det.faixas_adicionais ?? false));
+  const [marginais, setMarginais] = useState(Boolean(det.marginais ?? false));
   // Demais tipos
-  const [detalhamento, setDetalhamento] = useState('');
+  const [detalhamento, setDetalhamento] = useState(String(det.detalhamento ?? ''));
 
   const tipoSimples = tipo !== '' && (TIPOS_SIMPLES as string[]).includes(tipo);
 
@@ -93,28 +108,38 @@ export function OsForm({
           : { detalhamento };
 
     startTransition(async () => {
-      const res = await criarOS({
+      const payload = {
         tipo,
         crs,
         extensao_aprox: extensao,
         data_inicial: dataInicial,
         prazo_final: prazoFinal,
         detalhes,
-      });
-      if (!res.ok) return setErro(res.erro);
+      };
 
-      // Envia os anexos selecionados na abertura
+      let alvoId: string;
+      if (editando) {
+        const res = await editarOS(osId!, payload);
+        if (!res.ok) return setErro(res.erro);
+        alvoId = osId!;
+      } else {
+        const res = await criarOS(payload);
+        if (!res.ok) return setErro(res.erro);
+        alvoId = res.osId;
+      }
+
+      // Envia os anexos selecionados (na abertura ou adicionados na edição)
       for (const f of arquivos) {
         const fd = new FormData();
         fd.set('arquivo', f);
-        const up = await anexarArquivo(res.osId, fd);
+        const up = await anexarArquivo(alvoId, fd);
         if (!up.ok) {
-          setErro(`OS criada, mas o anexo "${f.name}" falhou: ${up.erro}`);
-          router.push(`/os/${res.osId}`);
+          setErro(`OS salva, mas o anexo "${f.name}" falhou: ${up.erro}`);
+          router.push(`/os/${alvoId}`);
           return;
         }
       }
-      router.push(`/os/${res.osId}`);
+      router.push(`/os/${alvoId}`);
     });
   }
 
@@ -123,7 +148,12 @@ export function OsForm({
       <div>
         <span className="label">Solicitante</span>
         <input className="input bg-zinc-100" value={nomeSolicitante} disabled />
-        {autoAprova && (
+        {editando && (
+          <p className="mt-1 text-xs text-zinc-500">
+            Editando OS existente — as alterações ficam registradas no histórico.
+          </p>
+        )}
+        {!editando && autoAprova && (
           <p className="mt-1 text-xs text-green-700">
             Você é Aprovador: esta OS será registrada já com status Aprovada.
           </p>
@@ -245,7 +275,7 @@ export function OsForm({
       <div className="flex justify-end gap-3">
         <button className="btn-ghost" type="button" onClick={() => router.back()}>Voltar</button>
         <button className="btn-primary" onClick={submit} disabled={pending}>
-          {pending ? 'Enviando…' : 'Abrir OS'}
+          {pending ? 'Enviando…' : editando ? 'Salvar alterações' : 'Abrir OS'}
         </button>
       </div>
     </div>

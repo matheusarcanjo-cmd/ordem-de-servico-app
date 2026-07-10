@@ -1,5 +1,6 @@
 import { createClient, requireUser } from '@/lib/supabase/server';
 import { DashboardView } from '@/components/DashboardView';
+import { DashboardGraficos } from '@/components/DashboardGraficos';
 import { PODE_CRIAR, VE_TODAS } from '@/lib/permissions';
 import Link from 'next/link';
 import type { OS } from '@/lib/types';
@@ -39,6 +40,7 @@ export default async function DashboardPage({
         )}
       </div>
       <DashboardView lista={lista} statusInicial={status} />
+      {VE_TODAS.includes(profile.papel) && <DashboardGraficos lista={lista} />}
     </div>
   );
 }

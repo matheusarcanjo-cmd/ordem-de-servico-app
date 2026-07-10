@@ -4,7 +4,7 @@ import { requireUser } from '@/lib/supabase/server';
 import { logout } from '@/actions/auth';
 import { NotificationBell } from '@/components/NotificationBell';
 import { PAPEL_LABEL } from '@/lib/types';
-import { PODE_CRIAR, PODE_APROVAR, PODE_OPERAR } from '@/lib/permissions';
+import { PODE_CRIAR, PODE_APROVAR, PODE_OPERAR, GERENCIA_USUARIOS } from '@/lib/permissions';
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   let user;
@@ -37,7 +37,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             {PODE_CRIAR.includes(profile.papel) && (
               <Link href="/os/nova" className="text-zinc-300 hover:text-white">Nova OS</Link>
             )}
-            {profile.papel === 'admin' && (
+            {GERENCIA_USUARIOS.includes(profile.papel) && (
               <Link href="/admin/usuarios" className="text-zinc-300 hover:text-white">Usuários</Link>
             )}
           </nav>

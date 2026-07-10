@@ -2,16 +2,36 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { criarUsuario, atualizarUsuario } from '@/actions/usuarios';
+import { criarUsuario, atualizarUsuario, apagarUsuario } from '@/actions/usuarios';
 import { PAPEL_LABEL, type Papel, type Profile } from '@/lib/types';
 
 const PAPEIS = Object.keys(PAPEL_LABEL) as Papel[];
 
-export function UsuariosAdmin({ usuarios, meuId }: { usuarios: Profile[]; meuId: string }) {
+export function UsuariosAdmin({
+  usuarios,
+  meuId,
+  meuPapel,
+}: {
+  usuarios: Profile[];
+  meuId: string;
+  meuPapel: Papel;
+}) {
+  const souAdmin = meuPapel === 'admin';
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [erro, setErro] = useState<string | null>(null);
   const [senhaGerada, setSenhaGerada] = useState<string | null>(null);
+  const [apagandoId, setApagandoId] = useState<string | null>(null);
+
+  function apagar(id: string) {
+    setErro(null);
+    startTransition(async () => {
+      const res = await apagarUsuario(id);
+      if (!res.ok) setErro(res.erro);
+      setApagandoId(null);
+      if (res.ok) router.refresh();
+    });
+  }
 
   function submit(fd: FormData) {
     setErro(null);
@@ -37,6 +57,7 @@ export function UsuariosAdmin({ usuarios, meuId }: { usuarios: Profile[]; meuId:
 
   return (
     <div className="space-y-6">
+      {souAdmin && (
       <form action={submit} className="grid grid-cols-1 items-end gap-3 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm sm:grid-cols-4">
         <div>
           <label className="label" htmlFor="nome">Nome</label>
@@ -54,6 +75,7 @@ export function UsuariosAdmin({ usuarios, meuId }: { usuarios: Profile[]; meuId:
         </div>
         <button className="btn-primary justify-center" disabled={pending}>Cadastrar usuário</button>
       </form>
+      )}
 
       {senhaGerada && (
         <p className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-800">
@@ -71,6 +93,7 @@ export function UsuariosAdmin({ usuarios, meuId }: { usuarios: Profile[]; meuId:
               <th className="px-3 py-2 font-semibold">E-mail</th>
               <th className="px-3 py-2 font-semibold">Papel</th>
               <th className="px-3 py-2 font-semibold">Situação</th>
+              <th className="px-3 py-2 font-semibold">Ações</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-100">
@@ -84,7 +107,7 @@ export function UsuariosAdmin({ usuarios, meuId }: { usuarios: Profile[]; meuId:
                   <select
                     className="input py-1"
                     value={u.papel}
-                    disabled={pending || u.id === meuId}
+                    disabled={pending || u.id === meuId || !souAdmin}
                     onChange={(e) => patch(u.id, { papel: e.target.value as Papel })}
                   >
                     {PAPEIS.map((p) => <option key={p} value={p}>{PAPEL_LABEL[p]}</option>)}
@@ -101,6 +124,29 @@ export function UsuariosAdmin({ usuarios, meuId }: { usuarios: Profile[]; meuId:
                   >
                     {u.ativo ? 'Ativo' : 'Desativado'}
                   </button>
+                </td>
+                <td className="px-3 py-2">
+                  {apagandoId === u.id ? (
+                    <span className="flex items-center gap-2">
+                      <button className="rounded bg-red-600 px-2 py-1 text-xs font-bold text-white hover:bg-red-700"
+                        disabled={pending} onClick={() => apagar(u.id)}>
+                        Confirmar exclusão
+                      </button>
+                      <button className="rounded border border-zinc-300 px-2 py-1 text-xs"
+                        disabled={pending} onClick={() => setApagandoId(null)}>
+                        Voltar
+                      </button>
+                    </span>
+                  ) : (
+                    <button
+                      className="rounded px-2 py-1 text-xs font-bold text-red-700 hover:bg-red-50 disabled:opacity-40"
+                      disabled={pending || u.id === meuId}
+                      title="Só é possível apagar usuários sem OS ou histórico; caso contrário, desative."
+                      onClick={() => setApagandoId(u.id)}
+                    >
+                      Apagar
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

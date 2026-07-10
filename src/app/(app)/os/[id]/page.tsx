@@ -159,6 +159,8 @@ export default async function OsDetalhePage({ params }: { params: Promise<{ id: 
           status={os.status}
           papel={profile.papel}
           souSolicitante={os.solicitante_id === userId}
+          solicitanteId={os.solicitante_id}
+          userId={userId}
         />
 
         <div className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
