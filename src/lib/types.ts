@@ -7,11 +7,12 @@ export type Tipo =
   | 'PENDULO_BRITANICO'
   | 'VIGA_BENKELMAN'
   | 'ICP'
-  | 'RETRO_REFLETANCIA';
+  | 'RETRO_REFLETANCIA'
+  | 'AMS_DBQ';
 
 /** Tipos que usam apenas o campo livre de detalhamento. */
 export const TIPOS_SIMPLES: Tipo[] = [
-  'MUMETER', 'MANCHA_AREIA', 'PENDULO_BRITANICO', 'VIGA_BENKELMAN', 'ICP', 'RETRO_REFLETANCIA',
+  'MUMETER', 'MANCHA_AREIA', 'PENDULO_BRITANICO', 'VIGA_BENKELMAN', 'ICP', 'RETRO_REFLETANCIA', 'AMS_DBQ',
 ];
 
 export const TIPO_LABEL: Record<Tipo, string> = {
@@ -23,6 +24,7 @@ export const TIPO_LABEL: Record<Tipo, string> = {
   VIGA_BENKELMAN: 'Viga Benkelman - Ensaio Deflectométrico',
   ICP: 'ICP',
   RETRO_REFLETANCIA: 'Retro Refletância',
+  AMS_DBQ: 'AMS/DBQ - Demarcação',
 };
 
 /** Rótulo curto para badges e tabela. */
@@ -35,6 +37,7 @@ export const TIPO_CURTO: Record<Tipo, string> = {
   VIGA_BENKELMAN: 'Viga B.',
   ICP: 'ICP',
   RETRO_REFLETANCIA: 'Retro',
+  AMS_DBQ: 'AMS/DBQ',
 };
 export type Status =
   | 'pendente'

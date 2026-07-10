@@ -7,7 +7,7 @@
 create type papel as enum ('solicitante', 'aprovador', 'editor', 'admin');
 create type tipo_levantamento as enum (
   'FWD', 'VDR', 'MUMETER', 'MANCHA_AREIA', 'PENDULO_BRITANICO',
-  'VIGA_BENKELMAN', 'ICP', 'RETRO_REFLETANCIA'
+  'VIGA_BENKELMAN', 'ICP', 'RETRO_REFLETANCIA', 'AMS_DBQ'
 );
 create type status_os as enum ('pendente', 'aprovada', 'rejeitada', 'em_execucao', 'concluida', 'cancelada');
 create type data_inicial as enum ('imediatamente', 'em_2_dias', 'em_5_dias', 'em_1_semana', 'em_1_mes');

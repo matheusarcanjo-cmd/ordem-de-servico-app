@@ -7,6 +7,7 @@ export const detalhesFWD = z.object({
   todas_faixas: simNao,
   faixas_adicionais: simNao,
   marginais: simNao,
+  detalhamento: z.string().trim().default(''),
 });
 
 export const detalhesVDR = z.object({
@@ -15,6 +16,7 @@ export const detalhesVDR = z.object({
   todas_faixas: simNao,
   faixas_adicionais: simNao,
   marginais: simNao,
+  detalhamento: z.string().trim().default(''),
 });
 
 /** Tipos com campo livre de detalhamento do ensaio. */
@@ -41,6 +43,7 @@ export const novaOSSchema = z.discriminatedUnion('tipo', [
   simples('VIGA_BENKELMAN'),
   simples('ICP'),
   simples('RETRO_REFLETANCIA'),
+  simples('AMS_DBQ'),
 ]);
 
 export type NovaOSInput = z.infer<typeof novaOSSchema>;

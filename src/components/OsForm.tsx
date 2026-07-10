@@ -102,9 +102,9 @@ export function OsForm({
     const comuns = { todas_faixas: todasFaixas, faixas_adicionais: faixasAdicionais, marginais };
     const detalhes =
       tipo === 'FWD'
-        ? { espacamento, ...comuns }
+        ? { espacamento, ...comuns, detalhamento }
         : tipo === 'VDR'
-          ? { cameras, gps_l1l2: gpsL1L2, ...comuns }
+          ? { cameras, gps_l1l2: gpsL1L2, ...comuns, detalhamento }
           : { detalhamento };
 
     startTransition(async () => {
@@ -211,6 +211,12 @@ export function OsForm({
             <SimNao label="Faixas adicionais" value={faixasAdicionais} onChange={setFaixasAdicionais} />
             <SimNao label="Marginais" value={marginais} onChange={setMarginais} />
           </div>
+          <div>
+            <label className="label" htmlFor="det-fwd">Detalhamento (opcional)</label>
+            <textarea id="det-fwd" className="input" rows={3} value={detalhamento}
+              onChange={(e) => setDetalhamento(e.target.value)}
+              placeholder="Observações adicionais sobre o ensaio, trecho ou condições…" />
+          </div>
         </fieldset>
       )}
 
@@ -233,6 +239,12 @@ export function OsForm({
             <SimNao label="Faixas adicionais" value={faixasAdicionais} onChange={setFaixasAdicionais} />
             <SimNao label="Marginais" value={marginais} onChange={setMarginais} />
           </div>
+          <div>
+            <label className="label" htmlFor="det-vdr">Detalhamento (opcional)</label>
+            <textarea id="det-vdr" className="input" rows={3} value={detalhamento}
+              onChange={(e) => setDetalhamento(e.target.value)}
+              placeholder="Observações adicionais sobre o ensaio, trecho ou condições…" />
+          </div>
         </fieldset>
       )}
 
@@ -249,12 +261,12 @@ export function OsForm({
       )}
 
       <div className="rounded-md border border-dashed border-zinc-300 p-4">
-        <span className="label">Anexos (KML, PDF, imagens do trecho)</span>
+        <span className="label">Anexos (KML, PDF, imagens, ZIP/RAR/7Z)</span>
         <button type="button" className="btn-ghost" onClick={() => fileRef.current?.click()}>
           Adicionar arquivos
         </button>
         <input ref={fileRef} type="file" multiple className="hidden"
-          accept=".kml,.kmz,.pdf,image/*" onChange={(e) => addArquivos(e.target.files)} />
+          accept=".kml,.kmz,.pdf,image/*,.zip,.rar,.7z" onChange={(e) => addArquivos(e.target.files)} />
         {arquivos.length > 0 && (
           <ul className="mt-3 space-y-1">
             {arquivos.map((f, i) => (

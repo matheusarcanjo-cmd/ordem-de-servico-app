@@ -107,6 +107,12 @@ export default async function OsDetalhePage({ params }: { params: Promise<{ id: 
                 <Item rotulo="Todas as faixas" valor={simNao(d.todas_faixas)} />
                 <Item rotulo="Faixas adicionais" valor={simNao(d.faixas_adicionais)} />
                 <Item rotulo="Marginais" valor={simNao(d.marginais)} />
+                {String(d.detalhamento ?? '').trim() !== '' && (
+                  <div className="col-span-2 sm:col-span-3">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Detalhamento</p>
+                    <p className="whitespace-pre-wrap text-sm text-zinc-900">{String(d.detalhamento)}</p>
+                  </div>
+                )}
               </div>
             ) : (
               <p className="mt-2 whitespace-pre-wrap text-sm text-zinc-800">
