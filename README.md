@@ -70,7 +70,16 @@ src/app/(app)/admin/usuarios         Gestão de usuários (Admin)
 src/app/api/pendentes                Contagem para o sino de notificações
 ```
 
+## Notificações por e-mail (nova OS)
+
+Quando uma OS é criada, Aprovadores, Editores e Admins **ativos** recebem um e-mail com o resumo e um botão direto para a OS (o criador não recebe o próprio aviso). Configuração:
+
+1. Crie uma conta gratuita em https://resend.com e gere uma **API Key**;
+2. Cadastre na Vercel (e no `.env.local`): `RESEND_API_KEY`, `EMAIL_FROM` e `NEXT_PUBLIC_APP_URL`;
+3. **Importante**: sem um domínio verificado no Resend, o modo de teste só entrega e-mails para o endereço da própria conta Resend. Para entregar à equipe, verifique o domínio da empresa (Resend → Domains → Add Domain, adicionando os registros DNS indicados) e use um remetente desse domínio no `EMAIL_FROM`;
+4. Se `RESEND_API_KEY` não estiver configurada, o app funciona normalmente e apenas registra um aviso no log — o e-mail nunca bloqueia a criação da OS.
+
 ## Próximos passos sugeridos
 - Campo estruturado de KM/estaca inicial e final (hoje coberto pelo anexo KML enviado na abertura da OS);
-- Notificações por e-mail na aprovação (Supabase Edge Function + Resend);
+- Notificações por e-mail também na aprovação/rejeição (mesma infraestrutura Resend já instalada);
 - Tempo real no badge via Supabase Realtime, substituindo o polling de 30 s.

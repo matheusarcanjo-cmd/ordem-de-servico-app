@@ -6,6 +6,7 @@ import { anexarArquivo, criarOS, editarOS } from '@/actions/os';
 import {
   CAMERAS_LABEL,
   DATA_INICIAL_LABEL,
+  DEPARTAMENTOS,
   TIPO_LABEL,
   TIPOS_SIMPLES,
   type Tipo,
@@ -192,8 +193,12 @@ export function OsForm({
         <select id="tipo" className="input" value={tipo}
           onChange={(e) => setTipo(e.target.value as Tipo | '')}>
           <option value="">Selecione…</option>
-          {(Object.keys(TIPO_LABEL) as Tipo[]).map((t) => (
-            <option key={t} value={t}>{TIPO_LABEL[t]}</option>
+          {DEPARTAMENTOS.map((dep) => (
+            <optgroup key={dep.nome} label={dep.nome}>
+              {dep.tipos.map((t) => (
+                <option key={t} value={t}>{TIPO_LABEL[t]}</option>
+              ))}
+            </optgroup>
           ))}
         </select>
       </div>

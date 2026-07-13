@@ -19,7 +19,7 @@ export const detalhesVDR = z.object({
   detalhamento: z.string().trim().default(''),
 });
 
-/** Tipos com campo livre de detalhamento do ensaio. */
+/** Tipos com campo livre de detalhamento do ensaio/atividade. */
 export const detalhesSimples = z.object({
   detalhamento: z.string().trim().default(''),
 });
@@ -31,7 +31,7 @@ const base = {
   prazo_final: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Selecione o prazo final'),
 };
 
-const simples = (tipo: string) =>
+const simples = <T extends string>(tipo: T) =>
   z.object({ tipo: z.literal(tipo), ...base, detalhes: detalhesSimples });
 
 export const novaOSSchema = z.discriminatedUnion('tipo', [
@@ -44,6 +44,31 @@ export const novaOSSchema = z.discriminatedUnion('tipo', [
   simples('ICP'),
   simples('RETRO_REFLETANCIA'),
   simples('AMS_DBQ'),
+  simples('CARRO_EMPRESTADO'),
+  simples('VISITA_TECNICA'),
+  simples('FEIRA_EVENTO'),
+  simples('GPR'),
+  simples('SOND_POCOS_INSPECAO'),
+  simples('SOND_TRADO'),
+  simples('SOND_ROTATIVAS'),
+  simples('LEV_OCORRENCIAS'),
+  simples('COLETA_OCORRENCIAS'),
+  simples('DEVOLUCAO_EQUIP'),
+  simples('TOPO_CONVENCIONAL'),
+  simples('TRK_500'),
+  simples('PEGASUS_TWO'),
+  simples('MATRICE_350'),
+  simples('BATIMETRIA'),
+  simples('LOCACAO_SONDAGENS'),
+  simples('LOCACAO_TOPOGRAFICA'),
+  simples('CAD_RODOVIARIO'),
+  simples('CAD_FERROVIARIO'),
+  simples('RASTREAMENTO_GNSS'),
+  simples('MONITORAMENTO_GEO'),
+  simples('VISTORIA_FISCALIZACAO'),
+  simples('MANUTENCAO_CALIBRACAO'),
+  simples('REUNIAO_TECNICA'),
+  simples('COLETA_PROPOSTA'),
 ]);
 
 export type NovaOSInput = z.infer<typeof novaOSSchema>;

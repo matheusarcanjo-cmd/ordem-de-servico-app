@@ -6,8 +6,40 @@
 -- ENUMs -------------------------------------------------------
 create type papel as enum ('solicitante', 'aprovador', 'editor', 'admin');
 create type tipo_levantamento as enum (
-  'FWD', 'VDR', 'MUMETER', 'MANCHA_AREIA', 'PENDULO_BRITANICO',
-  'VIGA_BENKELMAN', 'ICP', 'RETRO_REFLETANCIA', 'AMS_DBQ'
+  'FWD',
+  'VDR',
+  'MUMETER',
+  'MANCHA_AREIA',
+  'PENDULO_BRITANICO',
+  'VIGA_BENKELMAN',
+  'ICP',
+  'RETRO_REFLETANCIA',
+  'AMS_DBQ',
+  'CARRO_EMPRESTADO',
+  'VISITA_TECNICA',
+  'FEIRA_EVENTO',
+  'GPR',
+  'SOND_POCOS_INSPECAO',
+  'SOND_TRADO',
+  'SOND_ROTATIVAS',
+  'LEV_OCORRENCIAS',
+  'COLETA_OCORRENCIAS',
+  'DEVOLUCAO_EQUIP',
+  'TOPO_CONVENCIONAL',
+  'TRK_500',
+  'PEGASUS_TWO',
+  'MATRICE_350',
+  'BATIMETRIA',
+  'LOCACAO_SONDAGENS',
+  'LOCACAO_TOPOGRAFICA',
+  'CAD_RODOVIARIO',
+  'CAD_FERROVIARIO',
+  'RASTREAMENTO_GNSS',
+  'MONITORAMENTO_GEO',
+  'VISTORIA_FISCALIZACAO',
+  'MANUTENCAO_CALIBRACAO',
+  'REUNIAO_TECNICA',
+  'COLETA_PROPOSTA'
 );
 create type status_os as enum ('pendente', 'aprovada', 'rejeitada', 'em_execucao', 'concluida', 'cancelada');
 create type data_inicial as enum ('imediatamente', 'em_2_dias', 'em_5_dias', 'em_1_semana', 'em_1_mes');

@@ -5,13 +5,13 @@ import Link from 'next/link';
 import { StatusBadge } from './StatusBadge';
 import {
   DATA_INICIAL_LABEL,
+  DEPARTAMENTOS,
   STATUS_COLOR,
   STATUS_LABEL,
   TIPO_CURTO,
   TIPO_LABEL,
   type OS,
   type Status,
-  type Tipo,
 } from '@/lib/types';
 
 const COLUNAS: Status[] = ['pendente', 'aprovada', 'em_execucao', 'concluida', 'rejeitada', 'cancelada'];
@@ -81,8 +81,12 @@ export function DashboardView({ lista, statusInicial }: { lista: OS[]; statusIni
         </select>
         <select className="input max-w-64" value={fTipo} onChange={(e) => setFTipo(e.target.value)}>
           <option value="">Todos os tipos</option>
-          {(Object.keys(TIPO_LABEL) as Tipo[]).map((t) => (
-            <option key={t} value={t}>{TIPO_LABEL[t]}</option>
+          {DEPARTAMENTOS.map((dep) => (
+            <optgroup key={dep.nome} label={dep.nome}>
+              {dep.tipos.map((t) => (
+                <option key={t} value={t}>{TIPO_LABEL[t]}</option>
+              ))}
+            </optgroup>
           ))}
         </select>
         <div className="ml-auto flex overflow-hidden rounded-md border border-zinc-300">

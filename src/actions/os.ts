@@ -5,6 +5,7 @@ import { requireUser } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { novaOSSchema } from '@/lib/validation';
 import { PODE_APAGAR_OS, PODE_CRIAR, podeEditarOS, podeTransicionar } from '@/lib/permissions';
+import { notificarNovaOS } from '@/lib/email';
 import type { Status } from '@/lib/types';
 
 type Result = { ok: true } | { ok: false; erro: string };
@@ -39,7 +40,7 @@ export async function criarOS(input: unknown): Promise<CriarResult> {
         aprovado_por: autoAprovada ? userId : null,
         aprovado_em: autoAprovada ? agora : null,
       })
-      .select('id')
+      .select('id, numero_os')
       .single();
     if (error) return { ok: false, erro: error.message };
 
@@ -61,6 +62,19 @@ export async function criarOS(input: unknown): Promise<CriarResult> {
         observacao: 'Aprovação automática — OS aberta por Aprovador',
       });
     await admin.from('historico_status').insert(historico);
+
+    // Notifica aprovadores/editores/admins por e-mail (não bloqueia a criação)
+    await notificarNovaOS({
+      id: os.id,
+      numero_os: os.numero_os,
+      crs: parsed.data.crs,
+      tipo: parsed.data.tipo,
+      extensao_aprox: parsed.data.extensao_aprox,
+      prazo_final: parsed.data.prazo_final,
+      solicitanteNome: profile.nome,
+      solicitanteId: userId,
+      autoAprovada,
+    });
 
     revalidatePath('/dashboard');
     return { ok: true, osId: os.id };
