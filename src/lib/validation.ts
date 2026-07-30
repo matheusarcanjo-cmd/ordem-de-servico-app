@@ -69,6 +69,8 @@ export const novaOSSchema = z.discriminatedUnion('tipo', [
   simples('MANUTENCAO_CALIBRACAO'),
   simples('REUNIAO_TECNICA'),
   simples('COLETA_PROPOSTA'),
+  simples('CVC'),
+  simples('PESQUISA_OD'),
 ]);
 
 export type NovaOSInput = z.infer<typeof novaOSSchema>;

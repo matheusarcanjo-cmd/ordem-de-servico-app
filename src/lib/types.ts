@@ -26,7 +26,9 @@ export type Tipo =
   | 'MATRICE_350' | 'BATIMETRIA' | 'LOCACAO_SONDAGENS' | 'LOCACAO_TOPOGRAFICA'
   | 'CAD_RODOVIARIO' | 'CAD_FERROVIARIO' | 'RASTREAMENTO_GNSS'
   | 'MONITORAMENTO_GEO' | 'VISTORIA_FISCALIZACAO' | 'MANUTENCAO_CALIBRACAO'
-  | 'REUNIAO_TECNICA' | 'COLETA_PROPOSTA';
+  | 'REUNIAO_TECNICA' | 'COLETA_PROPOSTA'
+  // Tráfego
+  | 'CVC' | 'PESQUISA_OD';
 
 export const TIPO_LABEL: Record<Tipo, string> = {
   // Geral
@@ -66,6 +68,9 @@ export const TIPO_LABEL: Record<Tipo, string> = {
   MANUTENCAO_CALIBRACAO: 'Manutenção/Calibração de Equipamentos',
   REUNIAO_TECNICA: 'Reunião Técnica com Cliente',
   COLETA_PROPOSTA: 'Coleta de Dados para Elaboração de Proposta/Edital',
+  // Tráfego
+  CVC: 'Contagem Volumétrica Classificatória (CVC)',
+  PESQUISA_OD: 'Pesquisa Origem e Destino (OD)',
 };
 
 /** Rótulo curto para badges do Kanban e da tabela. */
@@ -104,6 +109,8 @@ export const TIPO_CURTO: Record<Tipo, string> = {
   MANUTENCAO_CALIBRACAO: 'Manut.',
   REUNIAO_TECNICA: 'Reunião',
   COLETA_PROPOSTA: 'Proposta',
+  CVC: 'CVC',
+  PESQUISA_OD: 'OD',
 };
 
 /** Agrupamento por departamento — ordem exibida na lista suspensa. */
@@ -132,6 +139,10 @@ export const DEPARTAMENTOS: { nome: string; tipos: Tipo[] }[] = [
       'MONITORAMENTO_GEO', 'VISTORIA_FISCALIZACAO', 'MANUTENCAO_CALIBRACAO',
       'REUNIAO_TECNICA', 'COLETA_PROPOSTA',
     ],
+  },
+  {
+    nome: 'Tráfego',
+    tipos: ['CVC', 'PESQUISA_OD'],
   },
 ];
 
