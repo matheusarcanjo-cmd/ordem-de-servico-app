@@ -2,8 +2,8 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { criarUsuario, atualizarUsuario, apagarUsuario } from '@/actions/usuarios';
 import { PAPEL_LABEL, type Papel, type Profile } from '@/lib/types';
+import { criarUsuario, atualizarUsuario, apagarUsuario, resetarSenha } from '@/actions/usuarios';
 
 const PAPEIS = Object.keys(PAPEL_LABEL) as Papel[];
 
@@ -22,6 +22,20 @@ export function UsuariosAdmin({
   const [erro, setErro] = useState<string | null>(null);
   const [senhaGerada, setSenhaGerada] = useState<string | null>(null);
   const [apagandoId, setApagandoId] = useState<string | null>(null);
+  const [senhaReset, setSenhaReset] = useState<{ nome: string; senha: string } | null>(null);
+
+  function resetar(id: string, nome: string) {
+    setErro(null);
+    setSenhaReset(null);
+    startTransition(async () => {
+      const res = await resetarSenha(id);
+      if (!res.ok) setErro(res.erro);
+      else {
+        setSenhaReset({ nome, senha: res.senhaProvisoria ?? '' });
+        router.refresh();
+      }
+    });
+  }
 
   function apagar(id: string) {
     setErro(null);
@@ -83,6 +97,13 @@ export function UsuariosAdmin({
           <code className="rounded bg-white px-1.5 py-0.5 font-mono font-bold">{senhaGerada}</code>
         </p>
       )}
+      {senhaReset && (
+  <p className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-800">
+    Senha de <strong>{senhaReset.nome}</strong> resetada. Nova senha provisória
+    (envie ao usuário — ele trocará no primeiro acesso):{' '}
+    <code className="rounded bg-white px-1.5 py-0.5 font-mono font-bold">{senhaReset.senha}</code>
+  </p>
+)}
       {erro && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
 
       <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white shadow-sm">
@@ -126,6 +147,16 @@ export function UsuariosAdmin({
                   </button>
                 </td>
                 <td className="px-3 py-2">
+                  {souAdmin && apagandoId !== u.id && (
+                    <button
+                    className="mr-2 rounded px-2 py-1 text-xs font-bold text-zinc-700 hover:bg-zinc-100 disabled:opacity-40"
+                    disabled={pending || u.id === meuId}
+                    title="Gera nova senha provisória e força troca no primeiro acesso"
+                    onClick={() => resetar(u.id, u.nome)}
+                    >
+                    Resetar senha
+                    </button>
+                  )}
                   {apagandoId === u.id ? (
                     <span className="flex items-center gap-2">
                       <button className="rounded bg-red-600 px-2 py-1 text-xs font-bold text-white hover:bg-red-700"

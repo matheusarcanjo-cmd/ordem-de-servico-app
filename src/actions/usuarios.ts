@@ -105,3 +105,26 @@ export async function apagarUsuario(id: string): Promise<Result> {
     return { ok: false, erro: (e as Error).message };
   }
 }
+/** Reseta a senha de um usuário (somente Admin): gera nova senha provisória
+ *  e força a troca no primeiro acesso. */
+export async function resetarSenha(id: string): Promise<Result> {
+  try {
+    const { userId, profile } = await requireUser();
+    if (profile.papel !== 'admin') return { ok: false, erro: 'Apenas Admin.' };
+    if (id === userId)
+      return { ok: false, erro: 'Peça a outro Admin para resetar a sua própria senha.' };
+
+    const senha = senhaProvisoria();
+    const admin = createAdminClient();
+
+    const { error } = await admin.auth.admin.updateUserById(id, { password: senha });
+    if (error) return { ok: false, erro: error.message };
+
+    await admin.from('profiles').update({ deve_trocar_senha: true }).eq('id', id);
+
+    revalidatePath('/admin/usuarios');
+    return { ok: true, senhaProvisoria: senha };
+  } catch (e) {
+    return { ok: false, erro: (e as Error).message };
+  }
+}
